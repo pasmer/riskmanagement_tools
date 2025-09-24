@@ -1,5 +1,7 @@
 import numpy as np
 
+# Old script
+
 def get_risk_ratings():
     ratings = []
     for i in range(6):
