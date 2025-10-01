@@ -1,6 +1,10 @@
-import numpy as np
-
 # Old script
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*- 
+# Script per calcolare la media ponderata dei rating di rischio
+# Utilizzando una funzione logaritmica per amplificare i pesi   
+
+import numpy as np
 
 def get_risk_ratings():
     ratings = []

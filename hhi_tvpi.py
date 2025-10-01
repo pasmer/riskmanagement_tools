@@ -1,4 +1,8 @@
-import pandas as pd
+# Script Python per calcolare l'Herfindahl-Hirschman Index (HHI) di concentrazione delle performance (TVPI)
+# Utilizzando un CSV di input con colonne: Deal (o altra id), TVPI (o PaidIn+NAV), Distributions (opzionale), NAV
+# Elaborato da ChatGPT-5
+
+import pandas as pd 
 import argparse
 import sys
 from typing import Tuple

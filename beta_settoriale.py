@@ -1,3 +1,5 @@
+# Script Python per calcolare Average Levered Beta settoriali
+# Utilizzando i database di Aswath Damodaran (NYU Stern)
 # Elaborato da ChatGPT-5
 import io
 import sys

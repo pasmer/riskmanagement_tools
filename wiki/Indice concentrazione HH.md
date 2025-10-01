@@ -1,4 +1,4 @@
-Ottima idea: usare un indice di concentrazione stile Herfindahl-Hirschman (HHI) sulle “quote di performance” legate al TVPI delle singole partecipazioni. Di seguito trovi un piccolo script Python che:
+Usare un indice di concentrazione stile Herfindahl-Hirschman (HHI) sulle “quote di performance” legate al TVPI delle singole partecipazioni. Di seguito trovi un piccolo script Python che:
 
 * legge un CSV,
 * calcola (se manca) il TVPI per ciascuna partecipazione,

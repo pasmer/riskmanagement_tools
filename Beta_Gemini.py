@@ -1,4 +1,6 @@
-# Gemini
+# Script Python per calcolare Average Levered Beta settoriali
+# Utilizzando i database di Aswath Damodaran (NYU Stern)
+# Approccio secondo Gemini
 import pandas as pd
 
 def calcola_average_levered_beta_settoriale(paesi_di_interesse):

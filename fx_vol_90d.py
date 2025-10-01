@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# Script per calcolare la volatilità storica a 90 giorni del cambio USD/EUR
+# Utilizzando i dati pubblici di FRED (Federal Reserve Economic Data)
 
 import io
 import sys
