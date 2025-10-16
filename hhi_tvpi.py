@@ -42,30 +42,52 @@ def build_shares(df: pd.DataFrame, mode: str) -> pd.Series:
       - 'value': s_i = (TVPI_i * PaidIn_i) / sum(TVPI_j * PaidIn_j) = (NAV+Distr)/totale
       - 'realized': s_i = (Distributions) / sum(Distributions)
       - 'unrealized': s_i = NAV / sum(NAV)
+      - 'invested': s_i = Investito_i / sum(Investito) [per CSV semplificato con importi investiti]
     """
-    tvpi = compute_tvpi(df)
+    if mode == 'invested':
+        # Modalità semplificata: usa direttamente la seconda colonna come importo investito
+        # Cerca colonne comuni per investimenti
+        invested_col = None
+        for col in ['Investito', 'Invested', 'Amount', 'Importo']:
+            if col in df.columns:
+                invested_col = col
+                break
 
-    if mode == 'tvpi':
-        w = tvpi.astype(float)
+        if invested_col is None:
+            # Se non trova colonne note, usa la seconda colonna del DataFrame
+            if len(df.columns) >= 2:
+                invested_col = df.columns[1]
+            else:
+                raise ValueError("Per mode='invested' serve almeno 2 colonne (nome società, importo investito).")
 
-    elif mode == 'value':
-        if 'PaidIn' not in df.columns:
-            raise ValueError("Per mode='value' serve la colonna PaidIn.")
-        paidin = df['PaidIn'].astype(float)
-        w = tvpi * paidin  # == NAV + Distr
-
-    elif mode == 'realized':
-        if 'Distributions' not in df.columns:
-            raise ValueError("Per mode='realized' serve la colonna Distributions.")
-        w = df['Distributions'].astype(float)
-
-    elif mode == 'unrealized':
-        if 'NAV' not in df.columns:
-            raise ValueError("Per mode='unrealized' serve la colonna NAV.")
-        w = df['NAV'].astype(float)
-
+        w = df[invested_col].astype(float)
+        if (w < 0).any():
+            raise ValueError("Sono presenti importi investiti negativi.")
     else:
-        raise ValueError("mode non valido. Usa: tvpi, value, realized, unrealized")
+        # Modalità esistenti che richiedono TVPI
+        tvpi = compute_tvpi(df)
+
+        if mode == 'tvpi':
+            w = tvpi.astype(float)
+
+        elif mode == 'value':
+            if 'PaidIn' not in df.columns:
+                raise ValueError("Per mode='value' serve la colonna PaidIn.")
+            paidin = df['PaidIn'].astype(float)
+            w = tvpi * paidin  # == NAV + Distr
+
+        elif mode == 'realized':
+            if 'Distributions' not in df.columns:
+                raise ValueError("Per mode='realized' serve la colonna Distributions.")
+            w = df['Distributions'].astype(float)
+
+        elif mode == 'unrealized':
+            if 'NAV' not in df.columns:
+                raise ValueError("Per mode='unrealized' serve la colonna NAV.")
+            w = df['NAV'].astype(float)
+
+        else:
+            raise ValueError("mode non valido. Usa: tvpi, value, realized, unrealized, invested")
 
     total = w.sum()
     if total <= 0:
@@ -100,11 +122,11 @@ def classify_hhi(hhi_norm: float) -> str:
         return "Alto"
 
 def main():
-    parser = argparse.ArgumentParser(description="Calcolo HHI di concentrazione delle performance (TVPI).")
+    parser = argparse.ArgumentParser(description="Calcolo HHI di concentrazione delle performance (TVPI) o investimenti.")
     parser.add_argument("input_csv", help="Percorso al CSV di input.")
-    parser.add_argument("--id-col", default="Deal", help="Nome colonna identificativa della partecipazione (default: Deal).")
-    parser.add_argument("--mode", choices=["tvpi","value","realized","unrealized"], default="value",
-                        help="Definizione delle quote: tvpi, value (default), realized, unrealized.")
+    parser.add_argument("--id-col", default="Deal", help="Nome colonna identificativa della partecipazione (default: Deal). Per mode=invested usa la prima colonna se non specificato.")
+    parser.add_argument("--mode", choices=["tvpi","value","realized","unrealized","invested"], default="value",
+                        help="Definizione delle quote: tvpi, value (default), realized, unrealized, invested (per CSV semplificato con importi investiti).")
     parser.add_argument("--output-csv", default=None, help="(Opzionale) Scrive un CSV con quote e contributi.")
     args = parser.parse_args()
 
@@ -130,22 +152,42 @@ def main():
     hhi, hhi_norm = compute_hhi(shares)
 
     # Costruisci output riassuntivo
+    # Per mode='invested', usa la prima colonna come ID se id_col non è specificato
+    if args.mode == 'invested':
+        id_column = args.id_col if args.id_col in df.columns else df.columns[0]
+    else:
+        id_column = args.id_col if args.id_col in df.columns else "Deal"
+
     out = pd.DataFrame({
-        args.id_col if args.id_col in df.columns else "Deal": df[args.id_col] if args.id_col in df.columns else range(1, len(df)+1),
+        id_column: df[id_column] if id_column in df.columns else range(1, len(df)+1),
         "Share": shares,
         "Share^2": shares**2
     })
 
-    # Aggiungi (se disponibili) colonne utili
-    for col in ["TVPI","PaidIn","NAV","Distributions"]:
-        if col in df.columns:
-            out[col] = df[col]
+    # Aggiungi colonne specifiche per mode='invested'
+    if args.mode == 'invested':
+        # Trova la colonna investito
+        invested_col = None
+        for col in ['Investito', 'Invested', 'Amount', 'Importo']:
+            if col in df.columns:
+                invested_col = col
+                break
+        if invested_col is None and len(df.columns) >= 2:
+            invested_col = df.columns[1]
 
-    # Contributo al valore totale (solo per mode='value')
-    if args.mode == "value":
-        # (= NAV + Distributions se Distributions presente, altrimenti NAV + 0)
-        distr = df['Distributions'] if 'Distributions' in df.columns else 0.0
-        out["ValueCreated"] = df["NAV"].astype(float) + distr.astype(float)
+        if invested_col:
+            out["Investito"] = df[invested_col].astype(float)
+    else:
+        # Aggiungi (se disponibili) colonne utili per le altre modalità
+        for col in ["TVPI","PaidIn","NAV","Distributions"]:
+            if col in df.columns:
+                out[col] = df[col]
+
+        # Contributo al valore totale (solo per mode='value')
+        if args.mode == "value":
+            # (= NAV + Distributions se Distributions presente, altrimenti NAV + 0)
+            distr = df['Distributions'] if 'Distributions' in df.columns else 0.0
+            out["ValueCreated"] = df["NAV"].astype(float) + distr.astype(float)
 
     # Ordina per Share decrescente
     out = out.sort_values(by="Share", ascending=False).reset_index(drop=True)

@@ -42,12 +42,20 @@ Questo repository raccoglie script indipendenti per analisi quantitative di risk
 - **Note**: include controlli su content-type e gestione errori per download falliti.
 
 ### hhi_tvpi.py
-- **Purpose**: calcolare l'indice di concentrazione Herfindahl-Hirschman (HHI) su metriche di performance (TVPI, valore, realized, unrealized) a partire da un CSV di portafoglio.
+- **Purpose**: calcolare l'indice di concentrazione Herfindahl-Hirschman (HHI) su metriche di performance (TVPI, valore, realized, unrealized) o su importi investiti (modalità semplificata) a partire da un CSV di portafoglio.
 - **Entry point**: `main()` con CLI basata su `argparse`.
 - **Dipendenze chiave**: `pandas`, `argparse`.
-- **Input**: CSV con colonne `Deal` (o equivalente), `TVPI` oppure `PaidIn`+`NAV`+(opzionale `Distributions`).
-- **Output**: stampa HHI e top contributor; puo salvare un CSV dettagliato con quote (`--output-csv`).
-- **Note**: nella directory `wiki` e presente ulteriore documentazione teorica (`wiki/Indice concentrazione HH.md`).
+- **Input**:
+  - Per modalità `value`: CSV con colonne `Deal`, `PaidIn`, `NAV`, `Distributions` (opzionale)
+  - Per modalità `tvpi`: CSV con colonne `Deal`, `TVPI`
+  - Per modalità `invested`: CSV semplificato a 2 colonne (nome società, importo investito in M€)
+- **Output**: stampa HHI, HHI normalizzato (0-1), livello di rischio, e top contributor; può salvare un CSV dettagliato con quote (`--output-csv`).
+- **Esempio modalità invested**:
+  ```bash
+  python hhi_tvpi.py input_invest.csv --mode invested --output-csv hhi_invested.csv
+  ```
+  Formato CSV: `Società,Investito` (2 colonne: identificativo, importo)
+- **Note**: nella directory `wiki` è presente ulteriore documentazione teorica (`wiki/Indice concentrazione HH.md`).
 
 ### weakest_link.py
 - **Purpose**: raccogliere rating di rischio tramite input utente e calcolare una media ponderata con pesi logaritmici.

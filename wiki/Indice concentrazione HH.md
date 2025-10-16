@@ -5,19 +5,23 @@ Usare un indice di concentrazione stile Herfindahl-Hirschman (HHI) sulle “quot
 * costruisce diverse definizioni di “quota” $s_i$ su cui calcolare l’HHI,
 * restituisce HHI e HHI normalizzato (0 = perfetta equidistribuzione, 1 = massima concentrazione).
 
-### Quale “quota” usare?
+### Quale "quota" usare?
 
-A seconda di come vuoi interpretare la “concentrazione della performance” puoi scegliere:
+A seconda di come vuoi interpretare la "concentrazione della performance" o degli investimenti puoi scegliere:
 
-1. **Quota su TVPI “puro”**
+1. **Quota su TVPI "puro"**
    $s_i = \dfrac{TVPI_i}{\sum_j TVPI_j}$
    Buona se vuoi pesare tutte le posizioni allo stesso modo e guardare solo la dispersione dei multipli.
 
-2. **Quota su valore creato/pesato per capitale investito (consigliata)**
+2. **Quota su valore creato/pesato per capitale investito (consigliata per performance)**
    $s_i = \dfrac{TVPI_i \cdot PaidIn_i}{\sum_j TVPI_j \cdot PaidIn_j} = \dfrac{NAV_i + Distr_i}{\sum_j (NAV_j + Distr_j)}$
    Misura la concentrazione della **performance economica complessiva** (quanta parte del valore totale generato è attribuibile a ogni deal).
 
-3. **Altre varianti** (opzionali nel codice): solo realizzato (DPI·PaidIn) o solo non realizzato (NAV).
+3. **Quota su importo investito (modalità semplificata)**
+   $s_i = \dfrac{Investito_i}{\sum_j Investito_j}$
+   Calcola direttamente la concentrazione degli investimenti in portafoglio, senza considerare la performance. Utile per analisi rapide del rischio di concentrazione basate solo sugli importi allocati.
+
+4. **Altre varianti** (opzionali nel codice): solo realizzato (DPI·PaidIn) o solo non realizzato (NAV).
 
 ---
 
@@ -215,8 +219,51 @@ Deal C,1.30
 # Variante consigliata (concentrazione sul valore complessivo generato)
 python hhi_tvpi.py input.csv --mode value --id-col Deal --output-csv hhi_output.csv
 
-# Se vuoi la concentrazione “solo sui multipli”
+# Se vuoi la concentrazione "solo sui multipli"
 python hhi_tvpi.py input_tvpi_only.csv --mode tvpi
+
+# Concentrazione semplice sugli importi investiti (modalità diretta)
+python hhi_tvpi.py input_invest.csv --mode invested --output-csv hhi_invested.csv
+```
+
+#### Esempio pratico modalità `invested`
+
+File CSV di input (`input_invest.csv`):
+```csv
+Società,Investito
+Alpha SpA,15.5
+Beta Srl,22.3
+Gamma Industries,8.7
+Delta Tech,31.2
+Epsilon Ventures,12.8
+Zeta Holdings,19.4
+Eta Consulting,5.6
+Theta Solutions,14.9
+```
+
+Esecuzione:
+```bash
+python hhi_tvpi.py input_invest.csv --mode invested
+```
+
+Output tipico:
+```
+=== Herfindahl-Hirschman Index (HHI) sulla definizione di quota: invested ===
+HHI        = 0.158324
+HHI* (0-1) = 0.085656  (0 = equidistribuzione, 1 = massima concentrazione)
+
+Top 10 contributi alle quote:
+       Società  Share  Share^2  Investito
+    Delta Tech  0.239   0.057       31.2
+      Beta Srl  0.171   0.029       22.3
+Zeta Holdings  0.149   0.022       19.4
+     Alpha SpA  0.119   0.014       15.5
+Theta Solutions 0.114  0.013       14.9
+Epsilon Ventures 0.098 0.010       12.8
+Gamma Industries 0.067 0.004        8.7
+Eta Consulting   0.043 0.002        5.6
+
+Livello di rischio = Basso
 ```
 
 ### Interpretazione rapida

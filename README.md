@@ -28,9 +28,31 @@ Eseguire gli script con Python attivando prima l'ambiente virtuale, ad esempio:
 ```bash
 python beta-analysis-script.py
 python fx_vol_90d.py --window 60 --save-csv
+
+# HHI su performance (TVPI)
 python hhi_tvpi.py input_tvpi_only.csv --mode value --output-csv hhi_output.csv
+
+# HHI su importi investiti (formato semplificato)
+python hhi_tvpi.py input_invest.csv --mode invested --output-csv hhi_invested.csv
 ```
 Gli script che richiedono input interattivo (es. `weakest_link.py`) possono essere lanciati direttamente e seguire le istruzioni a schermo.
+
+### Formato CSV per hhi_tvpi.py
+
+Lo script supporta diverse modalità di input:
+
+**Modalità `invested` (semplificata)**: CSV con 2 colonne
+```csv
+Società,Investito
+Alpha SpA,15.5
+Beta Srl,22.3
+Gamma Industries,8.7
+```
+Calcola la concentrazione degli investimenti direttamente sugli importi (es. milioni di euro).
+
+**Modalità `value`**: richiede colonne `PaidIn`, `NAV`, `Distributions` (opzionale)
+
+**Modalità `tvpi`**: richiede colonna `TVPI` o i dati per calcolarlo
 
 ## Risorse aggiuntive
 - Documentazione di dettaglio sull'indice di concentrazione: `wiki/Indice concentrazione HH.md`.
