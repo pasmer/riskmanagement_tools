@@ -109,6 +109,11 @@ def main():
         action="store_true",
         help="Se indicato, salva CSV con prezzi e rendimenti usati.",
     )
+    parser.add_argument(
+        "--end-date",
+        type=str,
+        help="Data di riferimento finale (YYYY-MM-DD). Se omessa, usa l'ultima disponibile.",
+    )
     args = parser.parse_args()
 
     # 1) Scarica serie da FRED
@@ -117,6 +122,19 @@ def main():
     except Exception as e:
         print(f"Errore nel download dati FRED: {e}", file=sys.stderr)
         sys.exit(1)
+
+    # 1.5) Filtra per data se richiesto
+    if args.end_date:
+        try:
+            ref_date = datetime.strptime(args.end_date, "%Y-%m-%d")
+            # series ha index datetime64[ns] (naive)
+            series = series[series.index <= ref_date]
+            if series.empty:
+                print(f"Nessun dato disponibile fino al {args.end_date}.", file=sys.stderr)
+                sys.exit(1)
+        except ValueError:
+            print("Errore: Il formato della data deve essere YYYY-MM-DD.", file=sys.stderr)
+            sys.exit(1)
 
     # 2) Calcola vol
     try:
