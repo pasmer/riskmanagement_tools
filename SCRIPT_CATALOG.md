@@ -34,11 +34,11 @@ Questo repository raccoglie script indipendenti per analisi quantitative di risk
 - **Note**: gestisce differenze di naming nei file Damodaran e include logica di fallback per anni mancanti.
 
 ### fx_vol_90d.py
-- **Purpose**: calcolare la volatilita storica annualizzata del cambio USD/EUR su una finestra di default di 90 giorni usando dati FRED.
+- **Purpose**: calcolare la volatilita storica annualizzata del cambio USD/EUR o JPY/EUR su una finestra di default di 90 giorni usando dati FRED.
 - **Entry point**: `main()` con CLI basata su `argparse`.
 - **Dipendenze chiave**: `requests`, `pandas`, `numpy`, `argparse`.
-- **Input**: parametri opzionali `--window` e `--save-csv`; necessita rete per scaricare il CSV FRED.
-- **Output**: stampa metriche di volatilita e, se richiesto, salva `usd_eur_fred_window_<N>d.csv` con serie e rendimenti.
+- **Input**: parametri opzionali `--window`, `--currency` (USD/JPY) e `--save-csv`; necessita rete per scaricare i CSV FRED.
+- **Output**: stampa metriche di volatilita e, se richiesto, salva `<currency>_eur_fred_window_<N>d.csv` con serie e rendimenti.
 - **Note**: include controlli su content-type e gestione errori per download falliti.
 
 ### hhi_tvpi.py

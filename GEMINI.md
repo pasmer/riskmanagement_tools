@@ -7,7 +7,7 @@ This file provides guidance to Gemini AI when working with code in this reposito
 This repository contains standalone Python scripts for quantitative risk management analysis. Each script operates independently and focuses on specific financial metrics:
 
 - **Sectoral beta analysis** using Damodaran datasets (NYU Stern)
-- **FX volatility calculations** from FRED data
+- **FX volatility calculations** from FRED data (USD/EUR, JPY/EUR)
 - **Portfolio concentration metrics** via Herfindahl-Hirschman Index
 - **Risk rating calculations** with logarithmic weighting
 
@@ -56,14 +56,18 @@ python beta_settoriale.py
 
 ### FX Volatility
 
-**fx_vol_90d.py** - USD/EUR historical volatility:
+**fx_vol_90d.py** - USD/EUR or JPY/EUR historical volatility:
 ```bash
+# Default USD/EUR
 python fx_vol_90d.py --window 60 --save-csv
+
+# JPY/EUR (calculated via cross-rate)
+python fx_vol_90d.py --window 60 --currency JPY --save-csv
 ```
 - Default 90-day rolling window
-- Downloads FRED DEXUSEU series
-- Calculates annualized volatility
-- Optional CSV export: `usd_eur_fred_window_<N>d.csv`
+- Downloads FRED DEXUSEU (and DEXJPUS for JPY) series
+- Calculates annualized volatility (direct or cross-rate)
+- Optional CSV export: `<currency>_eur_fred_window_<N>d.csv`
 
 ### Portfolio Concentration
 
@@ -157,6 +161,7 @@ See `wiki/Indice concentrazione HH.md` for detailed theory.
 
 - **Damodaran datasets**: https://pages.stern.nyu.edu/~adamodar/New_Home_Page/data.html
 - **FRED USD/EUR**: https://fred.stlouisfed.org/series/DEXUSEU
+- **FRED JPY/USD**: https://fred.stlouisfed.org/series/DEXJPUS
 
 Scripts require internet connectivity for downloads. Historical files use `xlrd` for legacy .xls format support.
 

@@ -17,7 +17,7 @@ pip install pandas numpy requests xlrd
 - `beta-analysis-script.py`: scarica i dataset Damodaran per piu regioni, consente analisi di settore, calcola beta levered/unlevered e produce CSV di confronto.
 - `Beta_Gemini.py`: funzione compatta che calcola l'average levered beta per i paesi indicati combinando dati Damodaran (sheet "Country").
 - `beta_settoriale.py`: pipeline parametrizzabile per aggregare beta settoriali Damodaran su archivi storici e pesare per numero di aziende.
-- `fx_vol_90d.py`: calcola la volatilita storica annualizzata del cambio USD/EUR (serie FRED DEXUSEU) su una finestra mobile di 90 giorni e salva opzionalmente i dati.
+- `fx_vol_90d.py`: calcola la volatilita storica annualizzata del cambio USD/EUR o JPY/EUR (serie FRED) su una finestra mobile di 90 giorni e salva opzionalmente i dati.
 - `hhi_tvpi.py`: misura la concentrazione dei risultati di portafoglio tramite HHI su TVPI o altre definizioni di quota, esportando il dettaglio per deal.
 - `weakest_link.py`: utility interattiva per derivare una media ponderata dei rating di rischio con pesi logaritmici.
 
@@ -28,6 +28,7 @@ Eseguire gli script con Python attivando prima l'ambiente virtuale, ad esempio:
 ```bash
 python beta-analysis-script.py
 python fx_vol_90d.py --window 60 --save-csv
+python fx_vol_90d.py --window 60 --currency JPY
 
 # HHI su performance (TVPI)
 python hhi_tvpi.py input_tvpi_only.csv --mode value --output-csv hhi_output.csv
@@ -57,7 +58,7 @@ Calcola la concentrazione degli investimenti direttamente sugli importi (es. mil
 ## Risorse aggiuntive
 - Documentazione di dettaglio sull'indice di concentrazione: `wiki/Indice concentrazione HH.md`.
 - I dataset Damodaran sono disponibili su https://pages.stern.nyu.edu/~adamodar/New_Home_Page/data.html
-- I dati FRED per USD/EUR sono accessibili tramite https://fred.stlouisfed.org/series/DEXUSEU
+- I dati FRED per USD/EUR e JPY/USD sono accessibili tramite https://fred.stlouisfed.org
 
 ## Note operative
 - Alcuni script effettuano download da internet: assicurarsi di avere connettivita o scaricare preventivamente i file.
